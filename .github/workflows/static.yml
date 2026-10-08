@@ -39,6 +39,7 @@ jobs:
           cp index.html admin.html _site/
           cp -R assets _site/assets
           touch _site/.nojekyll
+          sed -i "s/__ASSET_VERSION__/$GITHUB_SHA/g" _site/index.html _site/admin.html
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

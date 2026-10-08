@@ -56,3 +56,5 @@ GitHub 倉庫 Settings → Pages → Source 選 **GitHub Actions**。推送 `mai
 瀏覽器測試可驗證畫面、請求與錯誤處理；在 Supabase 專案及帳號尚未提供前，不能宣稱真實登入、RLS 權限或跨裝置雲端同步已驗證。完成設定後須執行上述無痕視窗和權限驗證。
 
 可重跑的前端整合測試：在有 Python Playwright 和 `/usr/bin/chromium` 的環境啟動網站後，執行 `python3 tests/test_cloud_flow.py`（可用 `CAREER_TEST_URL` 指定本地服務 URL）。測試模擬 Supabase API，不會使用真實帳號、修改真實資料庫，也不能取代 RLS 與真實同步驗證。
+
+每次 Pages 部署會把提交 SHA 作為 JS/CSS URL 版本，避免新版設定沿用舊快取。若剛修改設定仍出現缺少 URL／公開金鑰，先確認 Actions 最新部署為綠色勾號，再強制重新整理（Windows：Ctrl+Shift+R；Mac：Cmd+Shift+R）。

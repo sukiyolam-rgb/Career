@@ -14,7 +14,7 @@ window.Career = (() => {
   if(!['http:','https:'].includes(url.protocol)||job.url.length>2000)throw new Error('招聘連結須使用 http 或 https，最多 2000 字。');
   return Object.fromEntries(fields.map(f=>[f,job[f].trim()]));
  }
- function config(){const c=window.CAREER_CONFIG||{};if(!/^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/i.test(c.supabaseUrl)||!c.supabaseKey)throw new Error('網站尚未連接共用資料庫，請依 README 設定 Supabase。');
+ function config(){const c=window.CAREER_CONFIG||{};if(!c.supabaseUrl || !c.supabaseKey)throw new Error('網站尚未連接共用資料庫：'+(!c.supabaseUrl?'缺少 Project URL':'缺少公開金鑰')+'。請確認最新 GitHub 部署已成功，並強制重新整理頁面。');if(!/^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/i.test(c.supabaseUrl))throw new Error('Project URL 格式不正確，應為 https://專案代碼.supabase.co，不包含 /rest/v1/。');
  if(c.supabaseKey.startsWith('sb_secret_'))throw new Error('禁止在前端使用 secret key。');
  if(c.supabaseKey.startsWith('eyJ')){try{if(JSON.parse(atob(c.supabaseKey.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).role!=='anon')throw new Error();}catch{throw new Error('前端只允許 anon 公開金鑰。');}}
  else if(!c.supabaseKey.startsWith('sb_publishable_'))throw new Error('請使用 Supabase publishable 或 anon 公開金鑰。');return c;}

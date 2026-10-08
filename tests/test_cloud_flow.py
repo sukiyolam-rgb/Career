@@ -30,7 +30,7 @@ with sync_playwright() as p:
  def new_context():
   c=b.new_context();c.route('**://test.supabase.co/**',route)
   c.add_init_script("window.CAREER_CONFIG={supabaseUrl:'https://test.supabase.co',supabaseKey:'sb_publishable_test'}")
-  c.route('**/assets/config.js',lambda r:r.fulfill(content_type='application/javascript',body="window.CAREER_CONFIG={supabaseUrl:'https://test.supabase.co',supabaseKey:'sb_publishable_test'}"))
+  c.route('**/assets/config.js*',lambda r:r.fulfill(content_type='application/javascript',body="window.CAREER_CONFIG={supabaseUrl:'https://test.supabase.co',supabaseKey:'sb_publishable_test'}"))
   return c
  c=new_context();page=c.new_page();page.goto(BASE+'/admin.html');assert not page.locator('#adminPanel').is_visible()
  def login(email,password):page.locator('#email').fill(email);page.locator('#password').fill(password);page.locator('#loginForm button').click()
@@ -55,7 +55,7 @@ with sync_playwright() as p:
  page.locator('#logout').click();assert not page.locator('#adminPanel').is_visible();page.reload();assert not page.locator('#adminPanel').is_visible()
  pub.set_viewport_size({'width':390,'height':844});assert pub.evaluate('document.documentElement.scrollWidth<=innerWidth')
  # Missing project shows a truthful setup error and cannot fall back to browser-local jobs.
- unconfigured=b.new_page();unconfigured.goto(BASE+'/');unconfigured.wait_for_function("document.querySelector('#emptyState').textContent.includes('尚未連接')");unconfigured.locator('#search').fill('abc');assert '尚未連接' in unconfigured.locator('#emptyState').inner_text()
+ unconfigured=b.new_page();unconfigured.route('**/assets/config.js*',lambda r:r.fulfill(content_type='application/javascript',body="window.CAREER_CONFIG={supabaseUrl:'',supabaseKey:''}"));unconfigured.goto(BASE+'/');unconfigured.wait_for_function("document.querySelector('#emptyState').textContent.includes('尚未連接')");unconfigured.locator('#search').fill('abc');assert '尚未連接' in unconfigured.locator('#emptyState').inner_text()
  # Explicit network failure preserves a visible error rather than claiming a successful update.
  other.unroute('**://test.supabase.co/**');other.route('**://test.supabase.co/**',lambda r:r.fulfill(status=503,content_type='application/json',body='{"message":"unavailable"}'))
  pub.locator('#refreshJobs').click();pub.wait_for_function("document.querySelector('#emptyState').textContent.includes('unavailable')")
