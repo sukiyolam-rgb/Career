@@ -23,12 +23,17 @@ create table if not exists public.jobs (
   title text not null check (length(trim(title)) between 1 and 200),
   company text not null check (length(trim(company)) between 1 and 200),
   location text not null check (length(trim(location)) between 1 and 200),
+  industry text not null default '' check (length(industry) <= 100),
+  job_type text not null default '' check (length(job_type) <= 100),
   salary text not null check (length(trim(salary)) between 1 and 200),
   education text not null check (length(trim(education)) between 1 and 200),
   published date not null,
   deadline date check (deadline is null or deadline >= published),
   url text not null check (url ~* '^https?://[^[:space:]]+$' and length(url) <= 2000)
 );
+-- 相容已存在的舊資料表：保留舊資料，不猜測分類。
+alter table public.jobs add column if not exists industry text not null default '' check (length(industry) <= 100);
+alter table public.jobs add column if not exists job_type text not null default '' check (length(job_type) <= 100);
 alter table public.jobs enable row level security;
 revoke all on public.jobs from anon, authenticated;
 grant select on public.jobs to anon, authenticated;
@@ -51,9 +56,9 @@ begin
   if jsonb_array_length(items) > 2000 then raise exception '備份最多 2000 個崗位'; end if;
   lock table public.jobs in share row exclusive mode;
   delete from public.jobs;
-  insert into public.jobs (id,title,company,location,salary,education,published,deadline,url)
-  select id,title,company,location,salary,education,published,deadline,url
-  from jsonb_to_recordset(items) as x(id text,title text,company text,location text,salary text,education text,published date,deadline date,url text);
+  insert into public.jobs (id,title,company,location,industry,job_type,salary,education,published,deadline,url)
+  select id,title,company,location,coalesce(industry,''),coalesce(job_type,''),salary,education,published,deadline,url
+  from jsonb_to_recordset(items) as x(id text,title text,company text,location text,industry text,job_type text,salary text,education text,published date,deadline date,url text);
 end;
 $$;
 revoke all on function public.replace_jobs(jsonb) from public, anon;

@@ -37,7 +37,7 @@ with sync_playwright() as p:
  login('staff@example.com','wrong');page.wait_for_function("document.querySelector('#loginError').textContent.includes('登入失敗')");assert not page.locator('#adminPanel').is_visible()
  login('other@example.com','ok');page.wait_for_function("document.querySelector('#loginError').textContent.includes('未獲授權')");assert not page.locator('#adminPanel').is_visible()
  login('staff@example.com','ok');page.locator('#adminPanel').wait_for(state='visible')
- job={'title':'行政助理','company':'青年服務','location':'氹仔','salary':'MOP 15000','education':'學士','published':'2026-10-09','deadline':'','url':'https://example.com/jobs/1'}
+ job={'title':'行政助理','company':'青年服務','location':'氹仔','industry':'社會服務','job_type':'全職','salary':'MOP 15000','education':'學士','published':'2026-10-09','deadline':'','url':'https://example.com/jobs/1'}
  for field,v in job.items():page.locator(f'[name={field}]').fill(v)
  page.locator('#jobForm button[type=submit]').click();page.wait_for_function("document.querySelectorAll('.admin-job').length===1")
  assert db[0]['location']=='氹仔' and db[0]['deadline'] is None
@@ -52,6 +52,33 @@ with sync_playwright() as p:
  backup='/tmp/career-cloud-backup.json';dl.value.save_as(backup);assert json.loads(pathlib.Path(backup).read_text())['jobs'][0]['location']=='路氹城'
  page.once('dialog',lambda d:d.accept());page.get_by_role('button',name='刪除',exact=True).click();page.wait_for_function("document.querySelectorAll('.admin-job').length===0");assert not db
  page.once('dialog',lambda d:d.accept());page.locator('#importData').set_input_files(backup);page.wait_for_function("document.querySelectorAll('.admin-job').length===1");assert len(db)==1
+
+ # Pasted copy fills all explicitly labelled fields and waits for manual save.
+ page.locator('#newJob').click()
+ page.locator('#recruitmentText').fill('職位：活動助理，公司：青年中心，工作地點：澳門半島，行業：社會服務，崗位類型：兼職\n薪酬：MOP 8000\n學歷：中學\n發佈日期：2026-10-09\n截止日期：2026-10-31\nhttps://example.com/2')
+ page.once('dialog',lambda d:d.accept());page.locator('#applyRecruitmentText').click()
+ assert page.locator('[name=title]').input_value()=='活動助理'
+ assert page.locator('[name=location]').input_value()=='澳門半島'
+ assert page.locator('[name=industry]').input_value()=='社會服務'
+ assert page.locator('[name=job_type]').input_value()=='兼職'
+ assert len(db)==1
+ page.locator('#jobForm button[type=submit]').click();page.wait_for_function("document.querySelectorAll('.admin-job').length===2")
+ pub.locator('#clearFilters').click();pub.locator('#refreshJobs').click();pub.wait_for_function("document.querySelectorAll('.job-card').length===2")
+ pub.locator('#locationFilter').select_option('澳門半島');pub.locator('#industryFilter').select_option('社會服務');pub.locator('#jobTypeFilter').select_option('兼職');pub.locator('#educationFilter').select_option('中學');assert pub.locator('.job-card').count()==1
+ assert 'location-green' in pub.locator('.location-tag').get_attribute('class')
+ pub.locator('#jobTypeFilter').select_option('全職');assert pub.locator('.job-card').count()==0
+ pub.locator('#clearFilters').click();assert pub.locator('.job-card').count()==2
+ # Backward compatibility: records without new classification fields remain readable.
+ db.append({'id':'legacy',**{k:v for k,v in job.items() if k not in ('industry','job_type')}})
+ pub.locator('#refreshJobs').click();pub.wait_for_function("document.querySelectorAll('.job-card').length===3")
+ pub.locator('#industryFilter').select_option('未分類');assert pub.locator('.job-card').count()==1
+ assert '未分類' in pub.locator('.job-card').inner_text()
+ pub.locator('#clearFilters').click()
+ assert '每位青年建立一份青年主檔' not in pub.locator('body').inner_text()
+ service=other.new_page();service.goto(BASE+'/service.html');assert service.locator('a[href="tel:+85328280066"]').inner_text()=='28280066'
+ assert '澳門日報17樓' in service.locator('body').inner_text()
+ assert 'macau.myds.career@gmail.com' in service.locator('body').inner_text()
+ service.set_viewport_size({'width':390,'height':844});assert service.evaluate('document.documentElement.scrollWidth<=innerWidth')
  page.locator('#logout').click();assert not page.locator('#adminPanel').is_visible();page.reload();assert not page.locator('#adminPanel').is_visible()
  pub.set_viewport_size({'width':390,'height':844});assert pub.evaluate('document.documentElement.scrollWidth<=innerWidth')
  # Missing project shows a truthful setup error and cannot fall back to browser-local jobs.
@@ -60,5 +87,5 @@ with sync_playwright() as p:
  other.unroute('**://test.supabase.co/**');other.route('**://test.supabase.co/**',lambda r:r.fulfill(status=503,content_type='application/json',body='{"message":"unavailable"}'))
  pub.locator('#refreshJobs').click();pub.wait_for_function("document.querySelector('#emptyState').textContent.includes('unavailable')")
  assert not pub.locator('.job-card').count()
- print('PASS (Supabase API contract fixture): login/unauthorized staff gate; cloud CRUD; separate-context read; location filtering + OCR; backup restore; logout; network/setup failure; mobile layout. NOT a live cloud/RLS test.')
+ print('PASS (Supabase API contract fixture): login/unauthorized staff gate; cloud CRUD; separate-context read; combined education/location/industry/type filters; pasted-copy extraction + OCR parsing; legacy classifications; service page; backup restore; logout; network/setup failure; mobile layout. NOT a live cloud/RLS test.')
  b.close()

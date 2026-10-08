@@ -1,12 +1,14 @@
 /* 共用崗位讀寫：Supabase REST + Auth。崗位不再存入 localStorage。 */
 window.Career = (() => {
- const fields=['title','company','location','salary','education','published','deadline','url'];
+ const fields=['title','company','location','industry','job_type','salary','education','published','deadline','url'];
  let jobs=[],token=null,expiresAt=0;
  function validDate(value){return /^\d{4}-\d{2}-\d{2}$/.test(value)&&!Number.isNaN(Date.parse(value))&&new Date(value).toISOString().slice(0,10)===value;}
  function validate(job){
+  if(job)job={industry:'',job_type:'',...job};
   if(job && job.location===undefined)job={...job,location:''}; // 相容舊備份，匯入時補齊地點。
   if(!job||fields.some(f=>typeof job[f]!=='string'))throw new Error('崗位資料格式不正確。');
   for(const f of ['title','company','salary','education'])if(!job[f].trim()||job[f].length>200)throw new Error('請填妥崗位、公司、薪酬及學歷（最多 200 字）。');
+  if(job.industry.length>100||job.job_type.length>100)throw new Error('行業及崗位類型最多 100 字。');
   if(job.location.length>200)throw new Error('工作地點最多 200 字。');
   if(!validDate(job.published)||(job.deadline&&!validDate(job.deadline)))throw new Error('請輸入有效日期。');
   if(job.deadline&&job.deadline<job.published)throw new Error('截止日期不能早於發佈日期。');

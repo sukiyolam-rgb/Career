@@ -36,10 +36,10 @@ jobs:
       - name: Prepare website files
         run: |
           mkdir -p _site
-          cp index.html admin.html _site/
+          cp index.html admin.html service.html _site/
           cp -R assets _site/assets
           touch _site/.nojekyll
-          sed -i "s/__ASSET_VERSION__/$GITHUB_SHA/g" _site/index.html _site/admin.html
+          sed -i "s/__ASSET_VERSION__/$GITHUB_SHA/g" _site/index.html _site/admin.html _site/service.html
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
