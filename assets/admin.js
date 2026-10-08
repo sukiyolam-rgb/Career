@@ -19,7 +19,7 @@ function renderAdmin() {
   document.querySelector('#adminCount').textContent=`${jobs.length} 個崗位`;
   if(!jobs.length){list.append(C.element('p','尚未新增崗位。請填寫左側表單或上傳截圖。','muted'));return;}
   jobs.sort((a,b)=>b.published.localeCompare(a.published)).forEach(job=>{
-    const item=C.element('article',undefined,'admin-job');item.append(C.element('h3',job.title),C.element('p',`${job.company} · ${job.salary}`,'muted'),C.element('p',`${job.education} · ${job.published} · 截止：${job.deadline || '不設截止'}`,'muted'));
+    const item=C.element('article',undefined,'admin-job');item.append(C.element('h3',job.title),C.element('p',`${job.company} · ${job.salary}`,'muted'),C.element('p',`${job.location || '地點未提供'} · ${job.education} · ${job.published} · 截止：${job.deadline || '不設截止'}`,'muted'));
     const actions=C.element('div',undefined,'actions');const edit=C.element('button','編輯','secondary'),del=C.element('button','刪除','danger');
     edit.addEventListener('click',()=>{if(!authenticated)return;editingId=job.id;C.fields.forEach(f=>form.elements[f].value=job[f]);document.querySelector('#formTitle').textContent='編輯崗位';form.scrollIntoView({behavior:'smooth',block:'start'});});
     del.addEventListener('click',()=>{if(!authenticated || !confirm(`確定刪除「${job.title}」？此操作不能復原。`))return;try{C.write(C.read().filter(j=>j.id!==job.id));if(editingId===job.id)clearForm();renderAdmin();message('已刪除崗位。');}catch(error){message('刪除失敗：'+error.message);}});
@@ -27,7 +27,7 @@ function renderAdmin() {
   });
 }
 form.addEventListener('submit',e=>{
- e.preventDefault();try{requireLogin();const job=C.validate(Object.fromEntries(new FormData(form)));const jobs=C.read();
+ e.preventDefault();try{requireLogin();const job=C.validate(Object.fromEntries(new FormData(form)));if(!job.location)throw new Error('請填寫工作地點。');const jobs=C.read();
  if(editingId){const index=jobs.findIndex(j=>j.id===editingId);if(index<0)throw new Error('此崗位已被刪除，請重新新增。');jobs[index]={id:editingId,...job};}else{if(jobs.length>=2000)throw new Error('本地崗位上限為 2000 筆。');jobs.push({id:crypto.randomUUID(),...job});}
  C.write(jobs);clearForm();renderAdmin();message('崗位已儲存到此瀏覽器。');
  }catch(error){message('未能儲存：'+error.message);}
@@ -54,7 +54,7 @@ function loadEngine(){if(window.Tesseract)return Promise.resolve();if(!enginePro
 /* 保守的欄位提取：無標籤的值留空，絕不自動提交。 */
 function parseRecruitmentText(text){
  const result={};const lines=text.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
- const patterns={title:/^(?:崗位(?:名(?:字|稱))?|岗位(?:名(?:字|称))?|職位(?:名稱)?|职位(?:名称)?|招聘職位|job\s*title|position)\s*[:：]\s*(.+)$/i,company:/^(?:公司(?:名(?:字|稱|称))?|企業名稱|企业名称|僱主|雇主|company|employer)\s*[:：]\s*(.+)$/i,salary:/^(?:薪酬|薪資|薪资|工資|工资|待遇|月薪|salary)\s*[:：]\s*(.+)$/i,education:/^(?:學歷(?:要求)?|学历(?:要求)?|education)\s*[:：]\s*(.+)$/i};
+ const patterns={location:/^(?:工作地點|工作地点|工作地址|上班地點|上班地点|地點|地点|location|work(?:place|\s*location))\s*[:：]\s*(.+)$/i,title:/^(?:崗位(?:名(?:字|稱))?|岗位(?:名(?:字|称))?|職位(?:名稱)?|职位(?:名称)?|招聘職位|job\s*title|position)\s*[:：]\s*(.+)$/i,company:/^(?:公司(?:名(?:字|稱|称))?|企業名稱|企业名称|僱主|雇主|company|employer)\s*[:：]\s*(.+)$/i,salary:/^(?:薪酬|薪資|薪资|工資|工资|待遇|月薪|salary)\s*[:：]\s*(.+)$/i,education:/^(?:學歷(?:要求)?|学历(?:要求)?|education)\s*[:：]\s*(.+)$/i};
  for(const [field,pattern] of Object.entries(patterns)){const line=lines.find(l=>pattern.test(l));if(line)result[field]=line.match(pattern)[1].trim();}
  if(!result.salary){const salary=text.match(/(?:MOP|HKD|澳門元|澳门元|港幣|港币)\s*[\d,]+(?:\s*[-–至]\s*[\d,]+)?(?:\s*[／/]\s*(?:月|年|小時|小时))?/i);if(salary)result.salary=salary[0];}
  if(!result.education){const ed=text.match(/(?:學歷不限|学历不限|不限學歷|不限学历|博士|碩士|硕士|本科|學士|学士|大專|大专|高中|中學|中学|初中)/);if(ed)result.education=ed[0];}
