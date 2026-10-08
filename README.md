@@ -1,51 +1,58 @@
 # 澳門青年就業導航
 
-繁體中文靜態招聘資訊網站，使用 HTML、CSS、JavaScript，可部署至 GitHub Pages。無需 npm、建置或後端。
+繁體中文靜態招聘網站：GitHub Pages 提供頁面，Supabase 提供共用資料庫及服務員登入。無需 npm 建置。八個欄位包括崗位、公司、工作地點、薪酬、學歷、發佈日期、截止日期（選填）及原招聘連結。
 
-## 本地啟動
+## 第一次設定 Supabase（必須完成）
+
+1. 在 https://supabase.com/ 建立帳號及免費專案。選擇合適區域，資料庫密碼自行安全保存，不要填入網站程式。
+2. 在專案 **SQL Editor** 建立查詢，貼上 [supabase/setup.sql](supabase/setup.sql) 的內容並執行。建立公開招聘表、服務員授權表及 Row Level Security 權限。
+3. 在 **Authentication → Users → Add user / Create new user** 建立服務員的電郵及密碼帳號，確認電郵或勾選確認選項。記下該使用者的 **User UID**。
+4. 在 SQL Editor 單獨執行下列 SQL，將 UID 替換為剛建立的使用者 UUID：
+
+   ```sql
+   insert into public.staff_admins(user_id)
+   values ('服務員的 User UID') on conflict do nothing;
+   ```
+
+   日後新增服務員，重複步驟 3–4。撤銷權限：`delete from public.staff_admins where user_id = '要撤銷的 UID';`。刪除帳號也會刪除其授權。
+5. 在專案 **Connect** 或 **Settings → API / API Keys** 複製 **Project URL** 和 **Publishable key**（`sb_publishable_…`）。舊版 **anon** 公開金鑰亦可。將兩項填入 [assets/config.js](assets/config.js)。**絕不可使用 `service_role`、`sb_secret_…` 或帳號密碼。** 公開金鑰可出現在前端，寫入權限由資料庫 RLS 與登入者身分控制。
+6. 在 **Authentication → URL Configuration** 把 Site URL 設為 `https://sukiyolam-rgb.github.io/Career/`。直接電郵密碼登入不依賴 redirect；若日後用邀請信或重設密碼，再設定對應 redirect URL 和頁面流程。
+7. 建議在 Authentication 設定關閉公開註冊，只由管理員新增帳號。本網站不提供自行註冊功能；即使一般帳號登入，也必須列入 `staff_admins` 才能管理。
+8. 提交及推送 `assets/config.js`，等待 GitHub Pages 部署完成。到 `admin.html` 用服務員電郵與密碼登入，新增一個真實崗位，再用**另一個瀏覽器或無痕視窗**打開首頁，核對資料已同步。測試未授權帳號不能進入管理介面。
+
+上述專案建立、SQL 執行和公開設定尚未完成前，頁面會明確顯示「尚未連接共用資料庫」，不會使用本地假資料代替。
+
+## 資料如何更新
+
+後台新增、編輯、刪除會直接寫入 Supabase，不需要每次重新部署 GitHub Pages。新訪客讀取共用資料；已開啟網站的訪客每分鐘檢查更新，也可按「更新資訊」或返回頁面立即載入。網絡或資料庫故障時顯示載入失敗，不能保證離線使用。免費專案的額度及閒置暫停規則請以 Supabase 當前方案為準。
+
+登入 token 只保存在頁面記憶體，重新整理後須再次登入；過期後也須重新登入。舊的寫死管理密碼已移除。資料庫對匿名訪客只開放閱讀，只有列入 `staff_admins` 的使用者能新增／編輯／刪除。可讀取的招聘資料是公開資料，**不可放入青年主檔、個案檔、履歷或聯絡資料**。
+
+目前前台最多載入 2000 個崗位，超過上限會提示管理員整理資料。多人同時編輯同一崗位以最後成功寫入為準，請協調操作。JSON 匯入會取代全部共用崗位，使用交易整批驗證，失敗時回滾；先匯出備份再匯入。
+
+## 從舊版本遷移
+
+舊 localStorage 資料不會自動上傳或刪除。改版前，從舊版後台匯出 JSON 備份；若已改版，可在原瀏覽器開啟舊站同來源的開發者工具 Console 執行 `localStorage.getItem('macau-youth-jobs-v1')`，自行保存為 `{"version":1,"jobs":[…]}` 格式。不要把青年個人資料貼到聊天中。
+
+在備份中為每個崗位補上 `"location":"實際工作地點"`，然後用新版後台的「匯入備份」。沒有工作地點的備份會被拒絕，避免錯誤填造地點。可匯出新版 JSON 備份留存。
+
+## 截圖 OCR
+
+Tesseract.js 5.1.1 及官方中英文模型隨網站附帶，不需要 AI API 金鑰，不會將圖片傳往辨識服務。PNG、JPEG、WebP、BMP 最大 10 MB。首次約需下載 13 MB 執行資源。從有明確標籤的文字提取工作地點等欄位，識別後需人工校正，再按確認儲存，不會自動發布。
+
+## 本地開發及部署
 
 ```sh
 cd /workspace/Career
 python3 -m http.server 8000 --bind 0.0.0.0
 ```
 
-瀏覽 `index.html` 查看招聘資訊，`admin.html` 管理崗位。首次使用沒有崗位，不會填入虛構招聘。
+GitHub 倉庫 Settings → Pages → Source 選 **GitHub Actions**。推送 `main` 會執行 `.github/workflows/static.yml`；保留既有部署流程並只發布網站檔案，避免兩個流程同時部署。
 
-## 管理登入
+修改文字：`index.html` / `admin.html`；配色：`assets/style.css`；公開設定：`assets/config.js`；資料驗證與 Supabase 請求：`assets/app.js`；後台/OCR：`assets/admin.js`；卡片及搜尋：`assets/public.js`。Supabase 使用標準 REST/Auth API，無外部 JavaScript SDK 依賴。
 
-初始密碼：`M8!qR4#zN7@vT2$k`。在 `assets/admin.js` 的 `ADMIN_PASSWORD` 修改。登入狀態僅保存在頁面記憶體，重新整理或登出後需要再次登入。
+## 驗證範圍
 
-**前端密碼可從程式碼讀取，不能提供真正的身份驗證或資料安全。** GitHub Pages 公開發布所有靜態檔案。此網站不可存放青年主檔、個案檔、履歷、聯絡資料或其他敏感資料。
+瀏覽器測試可驗證畫面、請求與錯誤處理；在 Supabase 專案及帳號尚未提供前，不能宣稱真實登入、RLS 權限或跨裝置雲端同步已驗證。完成設定後須執行上述無痕視窗和權限驗證。
 
-## 資料及備份
-
-八個欄位：崗位名字、公司名字、工作地點、薪酬、學歷要求、發佈日期、截止日期（選填）、原招聘連結。新增後可編輯、確認刪除。前台可搜尋崗位、公司、學歷、工作地點及選擇學歷篩選。沒有截止日期顯示「不設截止」，過期崗位會標示。
-
-資料存於 `localStorage` 的 `macau-youth-jobs-v1`，僅在相同來源、同一瀏覽器共享。**服務員新增的資料不會同步到其他青年的瀏覽器。** 清除網站資料、改用其他裝置或從本地切換至 GitHub Pages 均不會自動保留資料。使用後台 JSON 匯出／匯入備份；匯入會在確認後取代全部資料。網站沒有青年主檔或個案管理功能。
-
-若日後需要所有青年看到同一份最新招聘，需另行使用集中資料來源（例如提交公開 JSON 至 GitHub，或建立具有真正身份驗證的後端）；目前版本嚴格使用使用者要求的本地儲存模式。
-
-## 截圖識別
-
-按需載入隨網站附帶的 Tesseract.js 5.1.1，以繁體中文、簡體中文及英文進行瀏覽器 OCR，不使用生成式 AI，也不需要 API 密鑰。OCR 引擎、WebAssembly 核心及官方 tessdata_fast 模型均放在 `assets/vendor/ocr/`，不依賴外部 CDN。圖片在瀏覽器中處理，不會上傳到辨識服務。首次使用需要從本站下載約 13 MB 的執行資源並初始化，下載失敗會顯示錯誤，可改手動填寫。官方模型版本及授權見 `assets/vendor/ocr/SOURCES.md`。
-
-支援 PNG、JPEG、WebP、BMP，最大 10 MB。識別後顯示原文，並提取標示為「崗位／職位」「公司」「工作地點」「薪酬」「學歷」「發佈日期」「截止日期」的欄位及 http/https 連結。無明確標籤的欄位可能無法提取，識別準確度取決於圖片品質及排版。所有內容均須人工校正，按「確認並儲存崗位」後才新增。日期及連結驗證不通過時不會寫入。
-
-## GitHub Pages 部署
-
-1. 將本專案檔案推送至 `sukiyolam-rgb/Career` 的 `main` 分支。
-2. 在 GitHub 倉庫 **Settings → Pages → Build and deployment → Source** 選擇 **GitHub Actions**。
-3. 執行已附的 `.github/workflows/pages.yml`（推送 main 會自動執行，也可手動執行）。
-4. 在 Actions 查看部署成功後，使用 Pages 設定頁提供的網址。
-
-工作流程只發布 `index.html`、`admin.html` 及 `assets/`，不發布說明文件。所有資源使用相對路徑，支援 GitHub Pages 的專案子路徑。
-
-## 修改位置
-
-- 服務名稱及文字：`index.html`、`admin.html`
-- 顏色、字體、響應式排版：`assets/style.css` 頂部變數
-- 管理密碼、OCR 與資料操作：`assets/admin.js`
-- 共用資料格式及驗證：`assets/app.js`
-- 招聘卡片及搜尋：`assets/public.js`
-
-舊版本本地資料／備份沒有工作地點時，顯示「未提供」，不會清除資料。新增或編輯時需填入工作地點。
+可重跑的前端整合測試：在有 Python Playwright 和 `/usr/bin/chromium` 的環境啟動網站後，執行 `python3 tests/test_cloud_flow.py`（可用 `CAREER_TEST_URL` 指定本地服務 URL）。測試模擬 Supabase API，不會使用真實帳號、修改真實資料庫，也不能取代 RLS 與真實同步驗證。
