@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>川西金秋 · 九寨溝之旅 2026.10.16-21</title>
+<style>
+  :root{
+    --bg:#FFF9EC; --bg2:#FFF3D9; --card:#FFFFFF;
+    --ink:#4A3318; --muted:#8A6D45; --line:#F0E0BE;
+    --gold:#E8A317; --amber:#D97706; --deep:#B45309;
+    --grad:linear-gradient(135deg,#F6C344,#E8890C);
+    --shadow:0 6px 22px rgba(180,83,9,.10);
+    --radius:18px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:"PingFang TC","Microsoft JhengHei","Noto Sans TC",system-ui,sans-serif;
+    background:var(--bg); color:var(--ink); line-height:1.7;
+  }
+  /* ---------- NAV ---------- */
+  nav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(255,249,236,.88);backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:6px;padding:10px 16px;flex-wrap:wrap;
+  }
+  nav .brand{font-weight:800;margin-right:auto;display:flex;align-items:center;gap:8px}
+  nav a{
+    text-decoration:none;color:var(--muted);font-size:14px;font-weight:600;
+    padding:6px 12px;border-radius:999px;transition:.2s;
+  }
+  nav a:hover{background:#FBEBC8;color:var(--deep)}
+  /* ---------- HERO ---------- */
+  header{
+    position:relative;overflow:hidden;text-align:center;
+    padding:100px 20px 92px;
+    background-image:
+      linear-gradient(180deg,rgba(24,14,2,.12) 0%,rgba(24,14,2,.42) 42%,rgba(24,14,2,.66) 78%,rgba(24,14,2,.80) 100%),
+      url("assets/img/jiuzhaigou.png");
+    background-size:cover;
+    background-position:center 42%;
+  }
+  header::after{
+    content:"";position:absolute;left:0;right:0;bottom:0;height:110px;z-index:1;pointer-events:none;
+    background:linear-gradient(180deg,rgba(255,249,236,0),var(--bg));
+  }
+  .leaf{position:absolute;top:-40px;font-size:22px;opacity:.9;animation:fall linear infinite;z-index:2;
+    filter:drop-shadow(0 2px 6px rgba(0,0,0,.35))}
+  @keyframes fall{
+    0%{transform:translateY(-40px) rotate(0deg)}
+    100%{transform:translateY(110vh) rotate(360deg)}
+  }
+  .hero-inner{position:relative;z-index:3;max-width:860px;margin:0 auto}
+  .hero-badge{
+    display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,240,200,.55);
+    backdrop-filter:blur(8px);padding:7px 18px;border-radius:999px;font-size:14px;font-weight:800;
+    color:#FFF6DF;letter-spacing:2px;text-shadow:0 1px 6px rgba(0,0,0,.4)
+  }
+  h1{
+    font-size:clamp(32px,5.8vw,56px);margin:20px 0 12px;font-weight:900;letter-spacing:4px;
+    color:#FFFFFF;text-shadow:0 3px 22px rgba(0,0,0,.55),0 1px 3px rgba(0,0,0,.4)
+  }
+  .hero-sub{
+    color:#FFEFCB;font-weight:700;font-size:clamp(15px,2.2vw,19px);letter-spacing:1px;
+    text-shadow:0 2px 12px rgba(0,0,0,.55)
+  }
+  .hero-hr{width:70px;height:3px;border-radius:3px;background:linear-gradient(90deg,transparent,#FFD873,transparent);margin:20px auto 0}
+  .hero-days{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:28px}
+  .hero-days a{
+    background:rgba(255,255,255,.92);color:var(--deep);text-decoration:none;font-weight:800;font-size:14px;
+    padding:9px 17px;border-radius:999px;transition:.2s;border:1px solid rgba(255,255,255,.6);
+    box-shadow:0 4px 14px rgba(0,0,0,.22);backdrop-filter:blur(6px)
+  }
+  .hero-days a:hover{transform:translateY(-3px);background:var(--grad);color:#fff;border-color:transparent}
+  /* ---------- LAYOUT ---------- */
+  main{max-width:1080px;margin:0 auto;padding:0 20px 80px}
+  section{margin-top:60px}
+  .sec-title{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+  .sec-title .ico{width:44px;height:44px;border-radius:14px;background:var(--grad);display:grid;place-items:center;font-size:22px;box-shadow:var(--shadow)}
+  .sec-title h2{font-size:24px;font-weight:900}
+  .sec-title small{display:block;color:var(--muted);font-weight:600;font-size:13px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+  /* ---------- FLIGHTS ---------- */
+  .flights{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
+  .flight{padding:22px;position:relative;overflow:hidden}
+  .flight .tag{position:absolute;top:0;right:0;font-size:12px;font-weight:800;color:#fff;padding:4px 14px;border-radius:0 0 0 12px;background:var(--grad)}
+  .flight .route{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:10px 0 6px}
+  .flight .city{text-align:center;flex:1}
+  .flight .city b{font-size:18px;display:block}
+  .flight .city span{font-size:12px;color:var(--muted)}
+  .flight .arrow{flex:1.4;text-align:center;color:var(--amber);font-weight:800;font-size:13px}
+  .flight .arrow .line{height:2px;background:linear-gradient(90deg,#F6C344,#E8890C);border-radius:2px;margin:6px 0;position:relative}
+  .flight .arrow .line::after{content:"▶";position:absolute;right:-4px;top:-8px;font-size:11px}
+  .flight .no{text-align:center;color:var(--muted);font-size:13px}
+  .flight .meta{display:flex;justify-content:space-between;border-top:1px dashed var(--line);margin-top:14px;padding-top:12px;font-size:13px}
+  .flight .meta b{color:var(--deep)}
+  .tips{margin-top:18px;padding:16px 20px;border-radius:var(--radius);background:#FFF6DF;border:1px dashed #E8C56A;color:#7A5410;font-size:14px;display:flex;gap:10px;align-items:flex-start}
+  /* ---------- DAY TABS ---------- */
+  .tabs{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:26px;position:sticky;top:56px;z-index:40;padding:10px;background:rgba(255,249,236,.92);backdrop-filter:blur(8px);border-radius:16px}
+  .tab{
+    cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--muted);
+    padding:9px 18px;border-radius:999px;font-weight:800;font-size:14px;transition:.2s;font-family:inherit;
+  }
+  .tab:hover{color:var(--deep);border-color:#E8C56A;transform:translateY(-2px)}
+  .tab.active{background:var(--grad);color:#fff;border-color:transparent;box-shadow:0 6px 16px rgba(232,137,12,.35)}
+  .day{display:none;animation:fade .35s ease}
+  .day.show{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .day-head{padding:0;overflow:hidden}
+  .day-head img{width:100%;height:280px;object-fit:cover;display:block}
+  .day-head .cover{position:relative}
+  .day-head .cover::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(62,42,15,.55))}
+  .day-head .cap{position:absolute;left:0;right:0;bottom:0;padding:16px 22px;color:#fff;z-index:2}
+  .day-head .cap b{font-size:22px;letter-spacing:1px}
+  .day-head .cap span{display:block;font-size:13px;opacity:.92;font-weight:600}
+  .day-body{padding:20px 22px 24px}
+  .route-line{
+    background:#FFF6DF;border:1px dashed #E8C56A;border-radius:12px;padding:10px 16px;
+    font-weight:700;color:#7A5410;font-size:14px;margin-bottom:18px
+  }
+  /* timeline */
+  .tl{position:relative;padding-left:8px}
+  .tl-item{display:flex;gap:14px;padding:10px 0;position:relative}
+  .tl-item::before{
+    content:"";position:absolute;left:25px;top:46px;bottom:-10px;width:2px;
+    background:linear-gradient(#F3DFAE,#F3DFAE);
+  }
+  .tl-item:last-child::before{display:none}
+  .tl-ico{
+    flex:0 0 36px;height:36px;width:36px;border-radius:12px;display:grid;place-items:center;
+    background:#FFF3D9;font-size:18px;border:1px solid #F0DFB2;z-index:1
+  }
+  .tl-main{flex:1;min-width:0}
+  .tl-time{display:inline-block;background:var(--grad);color:#fff;font-weight:800;font-size:12px;padding:2px 10px;border-radius:999px;margin-right:8px;vertical-align:2px}
+  .tl-text{font-size:15px}
+  .tl-note{font-size:13px;color:var(--muted);margin-top:2px}
+  /* location chips */
+  .locs{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .loc{
+    display:inline-flex;align-items:center;gap:5px;cursor:pointer;font-family:inherit;
+    background:#FFF8E8;border:1px solid #EFD9A0;color:var(--deep);
+    font-size:13px;font-weight:700;padding:4px 12px;border-radius:999px;transition:.15s;
+  }
+  .loc:hover{background:var(--grad);color:#fff;border-color:transparent}
+  .copybtn{
+    cursor:pointer;font-family:inherit;border:1px solid #EFD9A0;background:#fff;color:var(--muted);
+    font-size:12px;padding:4px 9px;border-radius:999px;transition:.15s;
+  }
+  .copybtn:hover{background:#FFF3D9;color:var(--deep)}
+  .sub-h{font-weight:900;font-size:16px;margin:18px 0 4px;display:flex;align-items:center;gap:8px;color:var(--deep)}
+  .gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:16px}
+  .gallery figure{border-radius:14px;overflow:hidden;border:1px solid var(--line);position:relative}
+  .gallery img{width:100%;height:170px;object-fit:cover;display:block}
+  .gallery figcaption{font-size:12px;padding:6px 10px;color:var(--muted);background:#FFFCF4;font-weight:700}
+  .mapimg{width:100%;border-radius:14px;border:1px solid var(--line);margin-top:16px;cursor:zoom-in;transition:.2s}
+  .mapimg:hover{box-shadow:0 10px 30px rgba(180,83,9,.2)}
+  /* ---------- CHECKLIST ---------- */
+  .ck-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px}
+  .progress{flex:1;min-width:220px;height:12px;background:#F4E7C8;border-radius:999px;overflow:hidden}
+  .progress i{display:block;height:100%;width:0;background:var(--grad);border-radius:999px;transition:width .3s}
+  .ck-count{font-weight:800;color:var(--deep);font-size:14px;white-space:nowrap}
+  .reset{cursor:pointer;font-family:inherit;border:1px solid #EFD9A0;background:#fff;color:var(--muted);font-size:13px;font-weight:700;padding:6px 14px;border-radius:999px}
+  .reset:hover{background:#FFF3D9;color:var(--deep)}
+  .ck-groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+  .ck-group{padding:18px}
+  .ck-group h3{font-size:16px;font-weight:900;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+  .ck{display:flex;align-items:flex-start;gap:10px;padding:7px 4px;border-radius:10px;cursor:pointer;transition:.15s;font-size:14px}
+  .ck:hover{background:#FFFAEB}
+  .ck input{display:none}
+  .box{
+    flex:0 0 20px;height:20px;width:20px;border-radius:6px;border:2px solid #E0C072;background:#fff;
+    display:grid;place-items:center;font-size:12px;color:#fff;transition:.15s;margin-top:2px
+  }
+  .ck input:checked + .box{background:var(--grad);border-color:transparent}
+  .box::after{content:"✓";opacity:0;font-weight:900}
+  .ck input:checked + .box::after{opacity:1}
+  .ck input:checked ~ .lbl{color:#B0A184;text-decoration:line-through}
+  footer{text-align:center;color:var(--muted);font-size:13px;padding:30px 20px 40px}
+  /* lightbox */
+  .lb{position:fixed;inset:0;background:rgba(40,25,5,.85);display:none;align-items:center;justify-content:center;z-index:100;padding:24px}
+  .lb.show{display:flex}
+  .lb img{max-width:96%;max-height:92vh;border-radius:12px}
+  .toast{
+    position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:#3E2A0F;color:#FFE9B8;padding:10px 22px;border-radius:999px;font-size:14px;font-weight:700;
+    opacity:0;pointer-events:none;transition:.25s;z-index:120
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  @media (max-width:600px){
+    .day-head img{height:200px}
+    nav .brand span{display:none}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">🍁 <span>川西金秋之旅</span></div>
+  <a href="#flights">✈️ 機票</a>
+  <a href="#itinerary">📅 行程</a>
+  <a href="#packing">🎒 準備清單</a>
+</nav>
+
+<header>
+  <div class="leaf" style="left:8%;animation-duration:9s;animation-delay:0s">🍂</div>
+  <div class="leaf" style="left:22%;animation-duration:12s;animation-delay:2s">🍁</div>
+  <div class="leaf" style="left:41%;animation-duration:10s;animation-delay:1s">🍂</div>
+  <div class="leaf" style="left:58%;animation-duration:13s;animation-delay:3s">🍃</div>
+  <div class="leaf" style="left:74%;animation-duration:11s;animation-delay:.5s">🍁</div>
+  <div class="leaf" style="left:90%;animation-duration:9.5s;animation-delay:2.5s">🍂</div>
+  <div class="hero-inner">
+    <span class="hero-badge">2026.10.16 — 10.21 · 6天5晚</span>
+    <h1>川西金秋 · 九寨溝之旅</h1>
+    <p class="hero-sub">珠海 → 重慶 → 成都 → 松潘 → 九寨溝 → 黃龍 → 珠海</p>
+    <div class="hero-hr"></div>
+    <div class="hero-days">
+      <a href="#itinerary" onclick="pickDay(0)">D1 重慶</a>
+      <a href="#itinerary" onclick="pickDay(1)">D2 成都</a>
+      <a href="#itinerary" onclick="pickDay(2)">D3 熊貓谷</a>
+      <a href="#itinerary" onclick="pickDay(3)">D4 松潘</a>
+      <a href="#itinerary" onclick="pickDay(4)">D5 九寨溝</a>
+      <a href="#itinerary" onclick="pickDay(5)">D6 黃龍</a>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ===== 機票 ===== -->
+<section id="flights">
+  <div class="sec-title">
+    <div class="ico">✈️</div>
+    <div><h2>機票信息</h2><small>往返航班 · 共 2 程</small></div>
+  </div>
+  <div class="flights">
+    <div class="card flight">
+      <span class="tag">去程 · 10月16日</span>
+      <div class="route">
+        <div class="city"><b>珠海</b><span>金湾机场 ZUH</span></div>
+        <div class="arrow">川航 3U8048<div class="line"></div>9:50 — 11:50</div>
+        <div class="city"><b>重慶</b><span>江北机场T3 CKG</span></div>
+      </div>
+      <div class="meta"><span>🛫 起飛 <b>09:50</b></span><span>🛬 到達 <b>11:50</b></span><span>⏱ 直飛約 <b>2h</b></span></div>
+    </div>
+    <div class="card flight">
+      <span class="tag">回程 · 10月21日</span>
+      <div class="route">
+        <div class="city"><b>成都</b><span>天府机场T2 TFU</span></div>
+        <div class="arrow">南航 CZ3730<div class="line"></div>18:15 — 20:35</div>
+        <div class="city"><b>珠海</b><span>金湾机场 ZUH</span></div>
+      </div>
+      <div class="meta"><span>🛫 起飛 <b>18:15</b></span><span>🛬 到達 <b>20:35</b></span><span>⏱ 直飛約 <b>2h20m</b></span></div>
+    </div>
+  </div>
+  <div class="tips"><span style="font-size:18px">⚠️</span><span><b>天府機場非常大</b>，回程務必 <b>提前 3 小時</b> 到達機場辦理手續（15:15 前抵達）。</span></div>
+</section>
+
+<!-- ===== 行程 ===== -->
+<section id="itinerary">
+  <div class="sec-title">
+    <div class="ico">📅</div>
+    <div><h2>每一天的行程</h2><small>點擊日期切換 · 點擊 <span style="color:var(--amber)">📍地點</span> 直接跳轉地圖，或用 📋 複製名稱去地圖搜尋</small></div>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+  <div id="days"></div>
+</section>
+
+<!-- ===== 準備清單 ===== -->
+<section id="packing">
+  <div class="sec-title">
+    <div class="ico">🎒</div>
+    <div><h2>需要準備的東西</h2><small>可勾選，自動保存在瀏覽器中</small></div>
+  </div>
+  <div class="ck-head">
+    <div class="progress"><i id="pbar"></i></div>
+    <span class="ck-count" id="pcount">0 / 0</span>
+    <button class="reset" onclick="resetList()">重置</button>
+  </div>
+  <div class="ck-groups" id="ckGroups"></div>
+</section>
+
+</main>
+
+<footer>🍁 川西金秋 · 九寨溝之旅 · 2026.10.16 — 10.21 🍁</footer>
+
+<div class="lb" id="lb" onclick="this.classList.remove('show')"><img id="lbImg" alt="放大圖片"></div>
+<div class="toast" id="toast">已複製 ✓</div>
+
+<script>
+/* ================= 行程数据 ================= */
+const DAYS = [
+  {
+    date:"10月16日 · 週五", city:"珠海 ➔ 重慶", cover:"assets/img/chongqing.png",
+    cap:"Day 1 · 重慶初體驗：輕軌穿樓 · 山城步道",
+    route:"🧭 重慶李子壩 ➔ 鵝嶺二廠 ➔ 山城步道 ➔ 大劇院機位 ➔ 江灘公園",
+    items:[
+      {i:"✈️", t:"9:50-11:50 珠海金灣機場 ➔ 重慶江北國際機場T3", n:"川航 3U8048", locs:["珠海金湾机场","重庆江北国际机场T3"]},
+      {i:"🚇", t:"下飛機坐地鐵10號線，曾家岩轉2號線到較場口，步行75米到酒店", n:"🏨 入住酒店、放行李"},
+      {i:"🍜", t:"文亮社區火鍋", n:"出發前先吃一頓正宗重慶火鍋 🌶️", locs:["文亮社区火锅"]},
+      {i:"🚇", t:"乘2號線到李子壩", n:""}, 
+      {i:"📍", t:"李子壩輕軌穿樓", n:"看單軌列車從樓中穿過，山城名場面 🚈", locs:["重庆李子坝轻轨站"]},
+      {i:"🚶", t:"步行24分鐘到鵝嶺二廠", n:"", locs:["鹅岭二厂"]},
+      {i:"🍜", t:"豌雜麵", n:"重慶特色小吃"},
+      {i:"📍", t:"鵝嶺 ➔ 山城步道 ➔ 大劇院機位 ➔ 江灘公園", n:"傍晚看江景，拍照打卡 🌆", locs:["重庆鹅岭公园","重庆山城步道","重庆江滩公园"]}
+    ]
+  },
+  {
+    date:"10月17日 · 週六", city:"重慶 ➔ 成都", cover:"assets/img/chengdu.png",
+    cap:"Day 2 · 成都慢生活：人民公園 · 春熙路 · 太古里",
+    route:"🧭 江北T3 ➔ 成都萬象匯 ➔ 人民公園 ➔ 春熙路 ➔ 太古里",
+    items:[
+      {i:"🚄", t:"重慶江北T3 ➔ 成都", n:"文檔原題為「成都出發重慶」，按當日地點整理為重慶→成都，可再確認"},
+      {i:"📍", t:"成都萬象匯", n:"先去酒店附近逛逛補給 🛍️", locs:["成都万象汇"]},
+      {i:"📍", t:"人民公園", n:"喝茶、掏耳朵，感受成都慢生活 🍵", locs:["成都人民公园"]},
+      {i:"📍", t:"春熙路", n:"", locs:["成都春熙路"]},
+      {i:"📍", t:"太古里", n:"夜逛太古里，看爬牆熊貓 🐼", locs:["成都太古里"]}
+    ],
+    gallery:[
+      {src:"assets/img/chengdu.png", cap:"成都 · 春熙路太古里"}
+    ]
+  },
+  {
+    date:"10月18日 · 週日", city:"熊貓谷 ➔ 青城山 ➔ 都江堰", cover:"assets/img/panda.png",
+    cap:"Day 3 · 熊貓 · 青城 · 水利 · 一日三景",
+    route:"🧭 犀浦 ➔ 熊貓谷 ➔ 青城山前山 ➔ 都江堰 ➔ 返程",
+    items:[
+      {i:"1️⃣", t:"熊貓谷 🐼", n:""},
+      {i:"🚄", t:"7:37 犀浦站 ➔ 青城山站", n:"高鐵票10元，車程27分鐘", locs:["犀浦站","青城山站"]},
+      {i:"🚕", t:"到達後直接打車去熊貓谷", n:"車費約18元，20分鐘", locs:["都江堰熊猫谷"]},
+      {i:"⏰", t:"8:30-11:30 熊貓谷", n:"🎫 門票55元（提前買，刷身份證）", locs:["都江堰熊猫谷"]},
+      {i:"🐼", t:"遊覽路線：大門 ➔ 回歸產房 ➔ 大熊貓一號別墅 ➔ 二號別墅 ➔ 三號別墅 ➔ 小熊貓放養區", n:"耗時約2.5小時。早上熊貓比較活躍，小熊貓放養區可以近距離觀看，有機會看到小熊貓追逐打鬧 🥹"},
+      {i:"2️⃣", t:"青城山 ⛰️", n:""},
+      {i:"🚕", t:"11:30-12:00 熊貓谷打車回青城山站", n:"車費18元"},
+      {i:"🚌", t:"在高鐵站旁坐觀光車到青城山檢票口", n:"往返35元（路程2.5km，建議坐車）", locs:["青城山前山景区"]},
+      {i:"⏰", t:"12:00-16:30 青城山前山", n:"🎫 門票80元（提前買，刷身份證）", locs:["青城山前山景区"]},
+      {i:"💡", t:"遊覽方式：上山爬、下山索道", n:"樓梯較多，有一定體力要求"},
+      {i:"🚶", t:"遊覽路線：檢票口 ➔ 天然閣 ➔ 天然圖畫 ➔ 五洞天 ➔ 天師洞 ➔ 擲筆槽 ➔ 朝陽洞 ➔ 三彎九道拐 ➔ 老君閣 ➔ 上清宮 ➔ 慈雲閣 ➔ 索道（單程35元）➔ 月城湖（擺渡船5元）➔ 大門", n:"全程耗時約4小時", locs:["青城山前山景区"]},
+      {i:"3️⃣", t:"都江堰 🏞️", n:""},
+      {i:"🚕", t:"16:30-17:30 青城山打車到都江堰秦堰樓", n:"車費約30元，30分鐘", locs:["都江堰秦堰楼"]},
+      {i:"💡", t:"從秦堰樓進，全程下坡", n:"對體力友好"},
+      {i:"⏰", t:"17:30-19:00 都江堰", n:"🎫 門票80元（提前買，刷身份證）", locs:["都江堰景区"]},
+      {i:"🚶", t:"遊覽路線：秦堰樓 ➔ 二王廟 ➔ 安瀾索橋 ➔ 魚嘴", n:"", locs:["都江堰二王庙","都江堰安澜索桥","都江堰鱼嘴"]},
+      {i:"💡", t:"時間充裕可繼續走：坐觀光車到飛沙堰 ➔ 離堆 ➔ 南橋", n:"傍晚時段光線好，適合看魚嘴和江景 🌇", locs:["都江堰飞沙堰","都江堰南桥"]},
+      {i:"4️⃣", t:"返程 19:00-19:30", n:""},
+      {i:"🚕", t:"南橋打車到離堆公園站", n:"10元", locs:["都江堰离堆公园站"]},
+      {i:"🚄", t:"乘坐18:54高鐵返回犀浦站", n:"車票10元"}
+    ],
+    gallery:[
+      {src:"assets/img/panda.png", cap:"都江堰熊貓谷"},
+      {src:"assets/img/qingchengshan.png", cap:"青城山"},
+      {src:"assets/img/dujiangyan.png", cap:"都江堰"}
+    ]
+  },
+  {
+    date:"10月19日 · 週一", city:"成都 ➔ 松潘 ➔ 九寨溝", cover:"assets/img/songpan.png",
+    cap:"Day 4 · 進溝之路：松潘古城 · 牦牛美食",
+    route:"🧭 成都東 ➔ 松潘古城 ➔ 松潘棧道 ➔ 九寨溝（三色林住宿）",
+    items:[
+      {i:"🚄", t:"8:00 成都東 ➔ 松潘站", n:"車程約2.5小時", locs:["成都东站","松潘站"]},
+      {i:"🍜", t:"出站直接去「親家燒烤」", n:"一元一串，然後上大巴去古城", locs:["松潘亲家烧烤"]},
+      {i:"🚌", t:"古城巴士", n:"2元，車程10分鐘", locs:["松潘古城"]},
+      {i:"📍", t:"松潘古城", n:"城牆、古門樓、經幡 🏮", locs:["松潘古城"]},
+      {i:"🍜", t:"古城吃：老敏飯店、牦牛酥餅、牦牛冰淇淋、牦牛漢堡、馬胖子烤肉店", n:"牦牛系列別錯過 🐂🍦", locs:["松潘老敏饭店","松潘马胖子烤肉店"]},
+      {i:"🚲", t:"坐共享單車到松潘加油站", n:"", locs:["松潘加油站"]},
+      {i:"🚶", t:"松潘棧道徒步", n:"路程3km，預計3小時，沿途高原河谷風光 🏞️", locs:["松潘栈道"]},
+      {i:"🍜", t:"下來吃個飯", n:"補充體力"},
+      {i:"🚌", t:"出發九寨溝", n:"平車約1小時50分鐘到", locs:["九寨沟风景区"]},
+      {i:"🏨", t:"到九寨溝，下車讓老闆來接", n:"回程預計兩個半小時，直達「三色林」住宿 🏠", locs:["九寨沟三色林住宿"]}
+    ]
+  },
+  {
+    date:"10月20日 · 週二", city:"九寨溝深度一日遊", cover:"assets/img/jiuzhaigou.png",
+    cap:"Day 5 · 九寨溝深度一日遊 · 海子 · 瀑布 · 彩林",
+    route:"🧭 檢票口 ➔ 日則溝（原始森林→五花海→鏡海）➔ 諾日朗中轉 ➔ 則查窪溝（長海→五彩池）➔ 樹正寨徒步出溝",
+    items:[
+      {i:"🎫", t:"門票 + 觀光車", n:"旺季190元+90元（淡季80+80）｜門票購買：阿壩旅遊網｜檢票口：藍天停車場 / 國大停車場"},
+      {i:"🚌", t:"檢票口坐觀光車直達最高點", n:"💡 盡量從上至下游玩，下車遊覽、原地上車走", locs:["九寨沟风景区"]},
+      {i:"🏔️", t:"右線 · 日則溝：原始森林(3080m) ➔ 劍岩懸泉 ➔ 芳草海 ➔ 天鵝海 ➔ 箭竹海 ➔ 熊貓海 ➔ 五花海 ➔ 珍珠灘瀑布 ➔ 鏡海", n:"徒步約50分鐘｜必去：箭竹海、五花海、珍珠灘瀑布、鏡海", locs:["九寨沟原始森林","九寨沟箭竹海","九寨沟五花海","九寨沟珍珠滩瀑布","九寨沟镜海"]},
+      {i:"🍽️", t:"中午在諾日朗中轉站休息、用餐", n:"", locs:["九寨沟诺日朗中转站"]},
+      {i:"🏔️", t:"左線 · 則查窪溝：諾日朗瀑布 ➔ 長海 ➔ 五彩池", n:"長海 ➔ 五彩池徒步約20分鐘｜必去：長海、五彩池", locs:["九寨沟诺日朗瀑布","九寨沟长海","九寨沟五彩池"]},
+      {i:"🚶", t:"精品徒步路線（約60分鐘）：犀牛海 ➔ 老虎海 ➔ 樹正瀑布 ➔ 樹正群海 ➔ 火花海 ➔ 蘆葦海", n:"", locs:["九寨沟犀牛海","九寨沟树正瀑布","九寨沟芦苇海"]},
+      {i:"💡", t:"注意遊玩事項：① 盡量從上至下游玩 ② 注意觀光車動態收班時間 ③ 氣溫變化大，帶件厚外套 🧥", n:""}
+    ],
+    mapImg:"assets/img/doc_day5.jpg"
+  },
+  {
+    date:"10月21日 · 週三", city:"九寨溝 ➔ 黃龍 ➔ 成都 ➔ 珠海", cover:"assets/img/huanglong.png",
+    cap:"Day 6 · 黃龍收官 · 返回珠海",
+    route:"🧭 九寨溝 ➔ 黃龍 ➔ 成都東 ➔ 天府機場 ➔ 珠海金灣",
+    items:[
+      {i:"⏰", t:"10:00 開始返程", n:""},
+      {i:"🏔️", t:"黃龍", n:"途經可遊覽五彩池鈣華池群，層層疊疊如人間瑤池 🌈", locs:["黄龙风景区","黄龙五彩池"]},
+      {i:"🚄", t:"13:45 抵達成都東", n:"", locs:["成都东站"]},
+      {i:"🚕", t:"前往成都天府機場T2", n:"⚠️ 天府機場非常大，務必提前3小時到達", locs:["成都天府国际机场T2"]},
+      {i:"⏰", t:"15:15 抵達機場", n:"辦理值機、安檢"},
+      {i:"✈️", t:"18:15-20:35 成都天府T2 ➔ 珠海金灣", n:"南航 CZ3730", locs:["珠海金湾机场"]}
+    ]
+  }
+];
+
+/* ================= 準備清單數據 ================= */
+const PACKING = [
+  {g:"🪪 證件票務", items:["身份證（景區刷證入園）","港澳居民來往內地通行證（回鄉證）","機票 / 高鐵票訂單截圖","學生證（部分景區有優惠）","少許現金零錢"]},
+  {g:"🧥 衣物（高原溫差大）", items:["厚外套 / 衝鋒衣","保暖內衣褲","舒適防滑運動鞋（爬山必備）","換洗衣物 × 5天","帽子 / 圍巾","睡衣"]},
+  {g:"🔌 電子設備", items:["手機 + 充電器","充電寶（大容量）","充電線","相機 / 運動相機","自拍杆","耳機"]},
+  {g:"💊 藥品防護", items:["感冒藥","腸胃藥","暈車藥","創可貼","紅景天 / 葡萄糖（高原）","潤唇膏","防曬霜（高原紫外線強）"]},
+  {g:"🧴 生活其他", items:["保溫杯","雨傘","紙巾 / 濕巾","墨鏡","護膚品 / 面霜","小零食（路上補給）","塑膠袋（裝髒衣服）"]}
+];
+
+/* ================= 渲染 ================= */
+const $ = s => document.querySelector(s);
+const amap = k => "https://uri.amap.com/search?keyword=" + encodeURIComponent(k);
+
+function chip(name){
+  return `<button class="loc" onclick="openMap('${name.replace(/'/g,"\\'")}')">📍 ${name}</button>` +
+         `<button class="copybtn" onclick="copyText('${name.replace(/'/g,"\\'")}')">📋</button>`;
+}
+
+function renderTabs(){
+  $("#tabs").innerHTML = DAYS.map((d,i)=>
+    `<button class="tab${i===0?" active":""}" data-i="${i}" onclick="pickDay(${i})">D${i+1} · ${d.city.split(" ➔ ").pop().split(" · ")[0]}</button>`
+  ).join("");
+}
+
+function renderDays(){
+  $("#days").innerHTML = DAYS.map((d,i)=>{
+    const items = d.items.map(it=>`
+      <div class="tl-item">
+        <div class="tl-ico">${it.i}</div>
+        <div class="tl-main">
+          <div class="tl-text">${it.t}</div>
+          ${it.n?`<div class="tl-note">${it.n}</div>`:""}
+          ${it.locs && it.locs.length?`<div class="locs">${it.locs.map(chip).join("")}</div>`:""}
+        </div>
+      </div>`).join("");
+    return `
+    <article class="day card day-head${i===0?" show":""}" id="day${i}">
+      <div class="cover">
+        <img src="${d.cover}" alt="${d.city}">
+        <div class="cap"><b>Day ${i+1} · ${d.city}</b><span>${d.date}</span></div>
+      </div>
+      <div class="day-body">
+        <div class="route-line">${d.route}</div>
+        <div class="tl">${items}</div>
+        ${d.gallery?`<div class="gallery">${d.gallery.map(g=>`<figure><img src="${g.src}" alt="${g.cap}" loading="lazy"><figcaption>${g.cap}</figcaption></figure>`).join("")}</div>`:""}
+        ${d.mapImg?`<img class="mapimg" src="${d.mapImg}" alt="九寨溝遊覽地圖" onclick="zoomImg(this.src)" loading="lazy">
+          <div class="tips" style="margin-top:12px"><span style="font-size:18px">🗺️</span><span>👆 點擊地圖可放大查看九寨溝遊覽路線圖（含必去景點與門票信息）</span></div>`:""}
+      </div>
+    </article>`;
+  }).join("");
+}
+
+function renderPacking(){
+  $("#ckGroups").innerHTML = PACKING.map((g,gi)=>`
+    <div class="card ck-group">
+      <h3>${g.g}</h3>
+      ${g.items.map((it,ii)=>`
+        <label class="ck">
+          <input type="checkbox" data-k="${gi}-${ii}" onchange="saveState()">
+          <span class="box"></span><span class="lbl">${it}</span>
+        </label>`).join("")}
+    </div>`).join("");
+  loadState();
+}
+
+function pickDay(i){
+  document.querySelectorAll(".day").forEach((el,k)=>el.classList.toggle("show",k===i));
+  document.querySelectorAll(".tab").forEach(el=>el.classList.toggle("active",+el.dataset.i===i));
+}
+
+function openMap(name){ window.open(amap(name), "_blank"); }
+function copyText(t){
+  (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject())
+    .then(()=>toast("已複製：" + t))
+    .catch(()=>{ const ta=document.createElement("textarea"); ta.value=t; document.body.appendChild(ta); ta.select();
+      try{document.execCommand("copy"); toast("已複製：" + t);}catch(e){toast(t);} ta.remove(); });
+}
+function toast(msg){
+  const el=$("#toast"); el.textContent=msg; el.classList.add("show");
+  clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove("show"),1600);
+}
+function zoomImg(src){ $("#lbImg").src=src; $("#lb").classList.add("show"); }
+
+/* ---------- checklist 状态 ---------- */
+function saveState(){
+  const st={};
+  document.querySelectorAll(".ck input").forEach(c=>{ if(c.checked) st[c.dataset.k]=1; });
+  localStorage.setItem("trip2026_packing", JSON.stringify(st));
+  updateProgress();
+}
+function loadState(){
+  let st={};
+  try{ st=JSON.parse(localStorage.getItem("trip2026_packing")||"{}"); }catch(e){}
+  document.querySelectorAll(".ck input").forEach(c=>c.checked=!!st[c.dataset.k]);
+  updateProgress();
+}
+function updateProgress(){
+  const all=[...document.querySelectorAll(".ck input")];
+  const done=all.filter(c=>c.checked).length;
+  $("#pbar").style.width = all.length? (done/all.length*100)+"%":"0";
+  $("#pcount").textContent = done + " / " + all.length;
+}
+function resetList(){
+  document.querySelectorAll(".ck input").forEach(c=>c.checked=false);
+  localStorage.removeItem("trip2026_packing");
+  updateProgress(); toast("已重置清單 🧺");
+}
+
+renderTabs(); renderDays(); renderPacking();
+</script>
+</body>
+</html>
