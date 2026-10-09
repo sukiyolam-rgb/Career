@@ -40,6 +40,7 @@ window.Career = (() => {
  async function remove(id){const rows=await request('/rest/v1/jobs?id=eq.'+encodeURIComponent(id),{method:'DELETE',auth:true,headers:{Prefer:'return=representation'}});if(!rows?.length)throw new Error('刪除未完成：資料已不存在或沒有權限。');jobs=jobs.filter(j=>j.id!==id);}
  async function replaceAll(rows){await request('/rest/v1/rpc/replace_jobs',{method:'POST',body:{items:rows.map(j=>({...validate(j),id:j.id,deadline:j.deadline||null}))},auth:true});jobs=rows.map(j=>({...j}));}
  function element(tag,text,className){const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(className)el.className=className;return el;}
+ function icon(name){const img=document.createElement('img');img.src='assets/icons/'+name+'.svg';img.alt='';img.className='icon';img.setAttribute('aria-hidden','true');return img;}
  function today(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
- return {fields,validate,read,refresh,login,logout,save,remove,replaceAll,element,today};
+ return {fields,validate,read,refresh,login,logout,save,remove,replaceAll,element,icon,today};
 })();

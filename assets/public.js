@@ -21,13 +21,19 @@ function render(){
  document.querySelector('#resultCount').textContent=`${filtered.length} 個崗位`;
  if(!filtered.length){empty.hidden=false;empty.textContent=jobs.length?'沒有符合條件的崗位，請嘗試其他關鍵字或重設篩選。':'目前未有招聘資訊，請稍後再查看。';}
  for(const job of filtered){
-  const card=C.element('article',undefined,'job-card');card.append(C.element('h3',job.title),C.element('p',job.company,'company'),C.element('span','工作地點 · '+category(job,'location'),'tag location-tag '+locationColor(job.location)),C.element('p',job.salary,'salary'));
-  const tags=C.element('div',undefined,'job-tags');tags.append(C.element('span',job.education,'tag'),C.element('span','行業 · '+category(job,'industry'),'tag'),C.element('span','類型 · '+category(job,'job_type'),'tag'));card.append(tags);
-  const dates=C.element('div',undefined,'dates');dates.append(C.element('span','發佈日期 · '+job.published),C.element('span','截止日期 · '+(job.deadline||'不設截止')));
+  const card=C.element('article',undefined,'job-card');
+  const heading=C.element('div',undefined,'job-card-heading');const identity=C.element('div',undefined,'job-identity');identity.append(C.element('h3',job.title),C.element('p',job.company,'company'));
+  const location=C.element('span',undefined,'tag location-tag '+locationColor(job.location));location.append(C.icon('map-pin'),C.element('span',category(job,'location')));location.setAttribute('aria-label','工作地點：'+category(job,'location'));heading.append(identity,location);
+  card.append(heading,C.element('p',job.salary,'salary'));
+  const tags=C.element('div',undefined,'job-tags');
+  for(const [name,value,label] of [['graduation-cap',job.education,'學歷'],['buildings',category(job,'industry'),'行業'],['briefcase',category(job,'job_type'),'崗位類型']]){const tag=C.element('span',undefined,'tag');tag.append(C.icon(name),C.element('span',value));tag.setAttribute('aria-label',label+'：'+value);tags.append(tag);}
+  card.append(tags);const bottom=C.element('div',undefined,'job-card-bottom');const dates=C.element('div',undefined,'dates');
+  const published=C.element('span');published.append(C.icon('calendar-blank'),C.element('span','發佈日期 · '+job.published));const deadline=C.element('span','截止日期 · '+(job.deadline||'不設截止'));dates.append(published,deadline);
   if(job.deadline&&job.deadline<C.today())dates.append(C.element('span','已截止，請核對原招聘資訊','expired'));
-  const link=C.element('a','查看原招聘資訊 ↗','button');link.href=job.url;link.target='_blank';link.rel='noopener noreferrer';link.setAttribute('aria-label',`查看 ${job.company} 的 ${job.title} 原招聘資訊（新視窗）`);card.append(dates,link);list.append(card);
+  const link=C.element('a',undefined,'button');link.append(C.element('span','查看原招聘資訊'),C.icon('arrow-up-right'));link.href=job.url;link.target='_blank';link.rel='noopener noreferrer';link.setAttribute('aria-label',`查看 ${job.company} 的 ${job.title} 原招聘資訊（新視窗）`);bottom.append(dates,link);card.append(bottom);list.append(card);
  }
 }
+document.querySelector('#searchForm').addEventListener('submit',e=>{e.preventDefault();render();document.querySelector('.jobs-heading').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});});
 search.addEventListener('input',render);filters.forEach(({select})=>select.addEventListener('change',render));
 document.querySelector('#clearFilters').addEventListener('click',()=>{search.value='';filters.forEach(({select})=>select.value='');render();});
 let loading=false;
