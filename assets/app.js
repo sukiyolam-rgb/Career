@@ -38,9 +38,11 @@ window.Career = (() => {
  const rows=await request('/rest/v1/jobs'+(existing?'?id=eq.'+encodeURIComponent(job.id):''),{method:existing?'PATCH':'POST',body,auth:true,headers:{Prefer:'return=representation'}});
  if(!rows?.length)throw new Error('未能修改崗位：資料已刪除或帳號權限已變更。');const saved=normalize(rows[0]);jobs=jobs.filter(j=>j.id!==saved.id).concat(saved);}
  async function remove(id){const rows=await request('/rest/v1/jobs?id=eq.'+encodeURIComponent(id),{method:'DELETE',auth:true,headers:{Prefer:'return=representation'}});if(!rows?.length)throw new Error('刪除未完成：資料已不存在或沒有權限。');jobs=jobs.filter(j=>j.id!==id);}
+ // PostgREST 的陣列 INSERT 為單一交易；一筆不合規即整批回滾。
+ async function addMany(rows){if(!rows.length)return;const body=rows.map(j=>{const values=validate(j);if(!values.location||!values.industry||!values.job_type)throw new Error('請填妥工作地點、行業及崗位類型。');return {...values,id:j.id,deadline:values.deadline||null};});if(jobs.length+body.length>2000)throw new Error('最多保留 2000 個崗位，請先整理現有資料。');const saved=await request('/rest/v1/jobs',{method:'POST',body,auth:true,headers:{Prefer:'return=representation'}});if(!Array.isArray(saved)||saved.length!==rows.length)throw new Error('資料庫回應筆數不符，請更新列表確認結果，勿重複提交。');jobs=jobs.concat(saved.map(normalize));}
  async function replaceAll(rows){await request('/rest/v1/rpc/replace_jobs',{method:'POST',body:{items:rows.map(j=>({...validate(j),id:j.id,deadline:j.deadline||null}))},auth:true});jobs=rows.map(j=>({...j}));}
  function element(tag,text,className){const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(className)el.className=className;return el;}
  function icon(name){const img=document.createElement('img');img.src='assets/icons/'+name+'.svg';img.alt='';img.className='icon';img.setAttribute('aria-hidden','true');return img;}
  function today(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
- return {fields,validate,read,refresh,login,logout,save,remove,replaceAll,element,icon,today};
+ return {fields,validate,read,refresh,login,logout,save,remove,addMany,replaceAll,element,icon,today};
 })();
