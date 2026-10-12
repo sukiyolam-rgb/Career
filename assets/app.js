@@ -1,14 +1,14 @@
 /* 共用崗位讀寫：Supabase REST + Auth。崗位不再存入 localStorage。 */
 window.Career = (() => {
- const fields=['title','company','location','industry','job_type','salary','education','published','deadline','url'];
+ const fields=['title','company','location','industry','job_type','salary','education','published','deadline','url','role_category'];
  let jobs=[],token=null,expiresAt=0;
  function validDate(value){return /^\d{4}-\d{2}-\d{2}$/.test(value)&&!Number.isNaN(Date.parse(value))&&new Date(value).toISOString().slice(0,10)===value;}
  function validate(job){
-  if(job)job={industry:'',job_type:'',...job};
+  if(job)job={industry:'',job_type:'',role_category:'',...job};
   if(job && job.location===undefined)job={...job,location:''}; // 相容舊備份，匯入時補齊地點。
   if(!job||fields.some(f=>typeof job[f]!=='string'))throw new Error('崗位資料格式不正確。');
   for(const f of ['title','company','salary','education'])if(!job[f].trim()||job[f].length>200)throw new Error('請填妥崗位、公司、薪酬及學歷（最多 200 字）。');
-  if(job.industry.length>100||job.job_type.length>100)throw new Error('行業及崗位類型最多 100 字。');
+  if(job.industry.length>100||job.job_type.length>100||job.role_category.length>100)throw new Error('行業、聘用形式及崗位類別最多 100 字。');
   if(job.location.length>200)throw new Error('工作地點最多 200 字。');
   if(!validDate(job.published)||(job.deadline&&!validDate(job.deadline)))throw new Error('請輸入有效日期。');
   if(job.deadline&&job.deadline<job.published)throw new Error('截止日期不能早於發佈日期。');
@@ -44,5 +44,5 @@ window.Career = (() => {
  function element(tag,text,className){const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(className)el.className=className;return el;}
  function icon(name){const img=document.createElement('img');img.src='assets/icons/'+name+'.svg';img.alt='';img.className='icon';img.setAttribute('aria-hidden','true');return img;}
  function today(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
- return {fields,validate,read,refresh,login,logout,save,remove,addMany,replaceAll,element,icon,today};
+ return {fields,validate,read,refresh,login,logout,save,remove,addMany,replaceAll,element,icon,today,request,validDate};
 })();

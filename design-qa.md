@@ -1,3 +1,5 @@
+> 歷史記錄：此檔記錄方案 3 的視覺校對。後續功能已加入分享、培訓及政策管理並移除 OCR；現行功能驗證見 tests/test_resources_flow.py、test_cloud_flow.py 和 test_excel_flow.py。
+
 # Design QA — selected option 3
 
 Source visual truth: `assets/design-previews/option-3.png` (1487 × 1058 pixels).

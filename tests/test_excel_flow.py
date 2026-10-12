@@ -28,13 +28,13 @@ with sync_playwright() as p, tempfile.TemporaryDirectory(prefix='career-excel-')
  template=Path(tmp)/'template.xlsx';d.value.save_as(template);assert template.read_bytes().startswith(b'PK')
  # A pristine template is blank and cannot accidentally insert its separate example guide.
  page.locator('#importExcel').set_input_files(str(template));page.wait_for_function("document.querySelector('#excelStatus').textContent.includes('沒有崗位資料')");assert page.locator('#confirmExcelImport').is_disabled();assert not db
- def workbook(name,rows,missing=False):
-  raw=page.evaluate('''async ({rows,missing})=>{await CareerExcel.load();const w=new ExcelJS.Workbook();const s=w.addWorksheet('崗位資訊');s.addRow(CareerExcel.columns.map(c=>c[1]));if(missing)s.getCell('J1').value='錯誤欄名';for(const row of rows){const r=s.addRow(row);if(r.getCell(8).value==='EXCEL_DATE'){r.getCell(8).value=new Date('2026-10-09T00:00:00Z');r.getCell(8).numFmt='yyyy-mm-dd';}if(r.getCell(6).value==='FORMULA')r.getCell(6).value={formula:'1+1',result:2};}return Array.from(new Uint8Array(await w.xlsx.writeBuffer()));}''',{'rows':rows,'missing':missing})
+ def workbook(name,rows,missing=False,legacy=False):
+  raw=page.evaluate('''async ({rows,missing,legacy})=>{await CareerExcel.load();const w=new ExcelJS.Workbook();const s=w.addWorksheet('崗位資訊');s.addRow(CareerExcel.columns.slice(0,legacy?10:11).map(c=>c[1]));if(legacy)s.getCell('E1').value='崗位類型';if(missing)s.getCell('J1').value='錯誤欄名';for(const row of rows){const r=s.addRow(row);if(r.getCell(8).value==='EXCEL_DATE'){r.getCell(8).value=new Date('2026-10-09T00:00:00Z');r.getCell(8).numFmt='yyyy-mm-dd';}if(r.getCell(6).value==='FORMULA')r.getCell(6).value={formula:'1+1',result:2};}return Array.from(new Uint8Array(await w.xlsx.writeBuffer()));}''',{'rows':rows,'missing':missing,'legacy':legacy})
   path=Path(tmp)/name;path.write_bytes(bytes(raw));return str(path)
  row=['行政助理','青年服務','氹仔','社會服務','全職','MOP 15000','學士','EXCEL_DATE','','https://example.com/1']
  row2=['活動助理','青年中心','澳門半島','社會服務','兼職','MOP 8000','中學','2026/10/09','2026-10-31','https://example.com/2']
  # Duplicate within the workbook is skipped. Existing database data is untouched until confirm.
- valid=workbook('valid.xlsx',[row,row2,row2,[]])
+ valid=workbook('valid.xlsx',[row,row2,row2,[]],legacy=True)
  page.locator('#importExcel').set_input_files(valid);page.wait_for_function("document.querySelector('#excelStatus').textContent.includes('檢查完成')")
  assert '待新增 2 筆' in page.locator('#excelSummary').inner_text();assert '略過 1 筆' in page.locator('#excelSummary').inner_text();assert not db
  page.once('dialog',lambda d:d.dismiss());page.locator('#confirmExcelImport').click();page.wait_for_function("document.querySelector('#excelStatus').textContent.includes('已取消確認')");assert not db
@@ -54,8 +54,8 @@ with sync_playwright() as p, tempfile.TemporaryDirectory(prefix='career-excel-')
  page.locator('#importExcel').set_input_files(workbook('header.xlsx',[row],True));page.wait_for_function("document.querySelector('#excelStatus').textContent.includes('缺少')");assert len(db)==2
  corrupt=Path(tmp)/'corrupt.xlsx';corrupt.write_text('not an XLSX');page.locator('#importExcel').set_input_files(str(corrupt));page.wait_for_function("document.querySelector('#excelStatus').textContent.includes('不是可讀取')")
  # Server rejection must not claim success, retry blindly or discard existing jobs.
- new=row2[:];new[0]='新招聘';new[9]='https://example.com/3';fail_next[0]=True
- page.locator('#importExcel').set_input_files(workbook('server-failure.xlsx',[new]));page.wait_for_function("document.querySelector('#excelStatus').textContent.includes('檢查完成')");page.once('dialog',lambda d:d.accept());page.locator('#confirmExcelImport').click();page.wait_for_function("document.querySelector('#excelStatus').textContent.includes('constraint failure')");assert len(db)==2;assert page.locator('#confirmExcelImport').is_disabled()
+ new=row2[:]+['傳媒'];new[0]='新招聘';new[9]='https://example.com/3';fail_next[0]=True
+ page.locator('#importExcel').set_input_files(workbook('server-failure.xlsx',[new]));page.wait_for_function("document.querySelector('#excelStatus').textContent.includes('檢查完成')");page.once('dialog',lambda d:d.accept());page.locator('#confirmExcelImport').click();page.wait_for_function("document.querySelector('#excelStatus').textContent.includes('constraint failure')");assert len(db)==2;assert batches[-1][0]['role_category']=='傳媒';assert page.locator('#confirmExcelImport').is_disabled()
  page.locator('#importExcel').set_input_files(valid);page.wait_for_function("document.querySelector('#excelStatus').textContent.includes('所有資料都已存在')")
  page.set_viewport_size({'width':390,'height':844});assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
  page.locator('#logout').click();assert not page.locator('#excelPreview').is_visible()

@@ -1,5 +1,5 @@
 const C=Career,search=document.querySelector('#search');
-const filters=[['education','educationFilter','全部學歷'],['location','locationFilter','全部地點'],['industry','industryFilter','全部行業'],['job_type','jobTypeFilter','全部類型']].map(([field,id,label])=>({field,select:document.getElementById(id),label}));
+const filters=[['education','educationFilter','全部學歷'],['location','locationFilter','全部地點'],['industry','industryFilter','全部行業'],['job_type','jobTypeFilter','全部形式'],['role_category','roleCategoryFilter','全部類別']].map(([field,id,label])=>({field,select:document.getElementById(id),label}));
 let dataError=null;
 const category=(job,field)=>job[field] || (field==='location'?'未提供':'未分類');
 /* 同一地點使用相同色系；文字始終保留，不單靠顏色區分。 */
@@ -17,7 +17,7 @@ function render(){
  const jobs=C.read();
  for(const {field,select,label} of filters){const selected=select.value;select.replaceChildren(new Option(label,''));[...new Set(jobs.map(j=>category(j,field)))].sort((a,b)=>a.localeCompare(b,'zh-Hant')).forEach(v=>select.add(new Option(v,v)));if(selected&&![...select.options].some(o=>o.value===selected))select.add(new Option(selected,selected));select.value=selected;}
  const q=search.value.trim().toLocaleLowerCase();
- const filtered=jobs.filter(j=>filters.every(({field,select})=>!select.value||category(j,field)===select.value)&&[j.title,j.company,j.education,j.location,j.industry,j.job_type].some(v=>(v||'').toLocaleLowerCase().includes(q))).sort((a,b)=>b.published.localeCompare(a.published));
+ const filtered=jobs.filter(j=>filters.every(({field,select})=>!select.value||category(j,field)===select.value)&&[j.title,j.company,j.education,j.location,j.industry,j.job_type,j.role_category].some(v=>(v||'').toLocaleLowerCase().includes(q))).sort((a,b)=>b.published.localeCompare(a.published));
  document.querySelector('#resultCount').textContent=`${filtered.length} 個崗位`;
  if(!filtered.length){empty.hidden=false;empty.textContent=jobs.length?'沒有符合條件的崗位，請嘗試其他關鍵字或重設篩選。':'目前未有招聘資訊，請稍後再查看。';}
  for(const job of filtered){
@@ -26,11 +26,11 @@ function render(){
   const location=C.element('span',undefined,'tag location-tag '+locationColor(job.location));location.append(C.icon('map-pin'),C.element('span',category(job,'location')));location.setAttribute('aria-label','工作地點：'+category(job,'location'));heading.append(identity,location);
   card.append(heading,C.element('p',job.salary,'salary'));
   const tags=C.element('div',undefined,'job-tags');
-  for(const [name,value,label] of [['graduation-cap',job.education,'學歷'],['buildings',category(job,'industry'),'行業'],['briefcase',category(job,'job_type'),'崗位類型']]){const tag=C.element('span',undefined,'tag');tag.append(C.icon(name),C.element('span',value));tag.setAttribute('aria-label',label+'：'+value);tags.append(tag);}
+  for(const [name,value,label] of [['graduation-cap',job.education,'學歷'],['buildings',category(job,'industry'),'行業'],['briefcase',category(job,'job_type'),'聘用形式'],['buildings',category(job,'role_category'),'崗位類別']]){const tag=C.element('span',undefined,'tag');tag.append(C.icon(name),C.element('span',value));tag.setAttribute('aria-label',label+'：'+value);tags.append(tag);}
   card.append(tags);const bottom=C.element('div',undefined,'job-card-bottom');const dates=C.element('div',undefined,'dates');
   const published=C.element('span');published.append(C.icon('calendar-blank'),C.element('span','發佈日期 · '+job.published));const deadline=C.element('span','截止日期 · '+(job.deadline||'不設截止'));dates.append(published,deadline);
   if(job.deadline&&job.deadline<C.today())dates.append(C.element('span','已截止，請核對原招聘資訊','expired'));
-  const link=C.element('a',undefined,'button');link.append(C.element('span','查看原招聘資訊'),C.icon('arrow-up-right'));link.href=job.url;link.target='_blank';link.rel='noopener noreferrer';link.setAttribute('aria-label',`查看 ${job.company} 的 ${job.title} 原招聘資訊（新視窗）`);bottom.append(dates,link);card.append(bottom);list.append(card);
+  const link=C.element('a',undefined,'button');link.append(C.element('span','查看原招聘資訊'),C.icon('arrow-up-right'));link.href=job.url;link.target='_blank';link.rel='noopener noreferrer';link.setAttribute('aria-label',`查看 ${job.company} 的 ${job.title} 原招聘資訊（新視窗）`);const actions=C.element('div',undefined,'job-actions');const copy=C.element('button','複製崗位資訊','secondary');copy.type='button';copy.setAttribute('aria-label','複製 '+job.title+' 的招聘資訊');copy.addEventListener('click',async()=>{copy.disabled=true;const result=await CareerShare.copy(CareerShare.formatJob(job));copy.textContent=result?'已複製':'手動複製';document.querySelector('#copyStatus').textContent=result?'已複製 '+job.title+' 的招聘資訊。':'請在對話框手動複製招聘資訊。';copy.disabled=false;setTimeout(()=>copy.textContent='複製崗位資訊',2500);});actions.append(copy,link);bottom.append(dates,actions);card.append(bottom);list.append(card);
  }
 }
 document.querySelector('#searchForm').addEventListener('submit',e=>{e.preventDefault();render();document.querySelector('.jobs-heading').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});});
